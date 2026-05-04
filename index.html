@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atherion — Class Info</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background blobs -->
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+  <div class="blob blob4"></div>
+
+  <div class="container">
+
+    <!-- ── Header ── -->
+    <div class="glass header">
+      <span class="emoji-float">🏫</span>
+      <h1>Welcome To Atherion</h1>
+      <p>SMA Negeri 2 Tasikmalaya · Tahun Ajaran 2025/2026</p>
+      <div class="badge-row">
+        <span class="badge">📚 36 Siswa</span>
+        <span class="badge">🎓 Wali Kelas: Bu Zahara</span>
+        <span class="badge">⭐ Kelas XI - A2</span>
+      </div>
+    </div>
+
+    <!-- ── Navigasi ── -->
+    <nav class="nav">
+      <button class="nav-btn active" onclick="showSection('siswa', this)">👥 Daftar Siswa</button>
+      <button class="nav-btn"        onclick="showSection('pengurus', this)">🏆 Pengurus</button>
+      <button class="nav-btn"        onclick="showSection('pelajaran', this)">📖 Jadwal Pelajaran</button>
+      <button class="nav-btn"        onclick="showSection('piket', this)">🧹 Jadwal Piket</button>
+    </nav>
+
+    <!-- ── SECTION: Daftar Siswa ── -->
+    <div class="section active section-wrap" id="sec-siswa">
+      <div class="glass card">
+        <div class="card-title">👥 Daftar Nama Siswa</div>
+        <div class="siswa-grid" id="siswa-grid"></div>
+        <div class="fun-fact" id="fun-fact">🎲 Klik nama siswa buat kejutan!</div>
+      </div>
+    </div>
+
+    <!-- ── SECTION: Pengurus ── -->
+    <div class="section section-wrap" id="sec-pengurus">
+      <div class="glass card">
+        <div class="card-title">🏆 Struktur Pengurus Kelas</div>
+        <div class="pengurus-grid" id="pengurus-grid"></div>
+        <div class="quote-box">
+          "Kelas yang kompak itu bukan yang nggak punya drama,<br>
+          tapi yang tetep kompak meskipun penuh drama." 😂
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION: Jadwal Pelajaran ── -->
+    <div class="section section-wrap" id="sec-pelajaran">
+      <div class="glass card">
+        <div class="card-title">📖 Jadwal Pelajaran Mingguan</div>
+        <div class="jadwal-tabs" id="hari-tabs"></div>
+        <div class="mapel-list"  id="mapel-list"></div>
+        <div class="fun-fact">
+          💡 Tips: Kalau ngantuk di kelas, coba buka mata lebar-lebar.
+          Berhasil? Selamat! Belum? Normal.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SECTION: Jadwal Piket ── -->
+    <div class="section section-wrap" id="sec-piket">
+      <div class="glass card">
+        <div class="card-title">🧹 Jadwal Piket Mingguan</div>
+        <div class="grid-2" id="piket-grid"></div>
+        <div class="fun-fact">
+          🧹 Ingat: piket bukan hukuman, tapi latihan jadi ibu/bapak
+          rumah tangga masa depan!
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.container -->
+
+  <script src="script.js"></script>
+</body>
+</html>

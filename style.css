@@ -76,7 +76,7 @@ body {
 /* ── Header ── */
 .header {
   text-align: center;
-  padding: 48px 32px 36px;
+  padding: 40px 32px 36px;
   margin-bottom: 28px;
   overflow: hidden;
 }
@@ -87,16 +87,35 @@ body {
   background: linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0.06));
   border-radius: var(--radius);
 }
-.emoji-float {
-  font-size: 52px;
+
+/* ── Logo Circle ── */
+.logo-circle {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 16px;
+  border: 4px solid rgba(255,255,255,0.85);
+  box-shadow:
+    0 0 0 3px rgba(94,142,247,0.35),
+    0 8px 32px rgba(94,142,247,0.25),
+    0 0 0 7px rgba(255,255,255,0.2);
+  position: relative;
+  z-index: 1;
+  animation: logoPulse 3s ease-in-out infinite;
+  background: #fff;
+}
+.logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
-  animation: bounce 2s ease-in-out infinite;
-  margin-bottom: 12px;
 }
-@keyframes bounce {
-  0%, 100% { transform: translateY(0) rotate(-3deg); }
-  50%       { transform: translateY(-12px) rotate(3deg); }
+@keyframes logoPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(94,142,247,0.35), 0 8px 32px rgba(94,142,247,0.25), 0 0 0 7px rgba(255,255,255,0.2); }
+  50%       { box-shadow: 0 0 0 5px rgba(176,110,245,0.4), 0 12px 40px rgba(176,110,245,0.3), 0 0 0 10px rgba(255,255,255,0.25); }
 }
+
 .header h1 {
   font-size: 42px;
   font-weight: 900;
@@ -106,11 +125,15 @@ body {
   background-clip: text;
   letter-spacing: -1px;
   margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
 }
 .header p {
   font-size: 16px;
   color: var(--text-soft);
   font-weight: 600;
+  position: relative;
+  z-index: 1;
 }
 .badge-row {
   display: flex;
@@ -118,6 +141,8 @@ body {
   justify-content: center;
   flex-wrap: wrap;
   margin-top: 16px;
+  position: relative;
+  z-index: 1;
 }
 .badge {
   padding: 6px 16px;
@@ -128,6 +153,93 @@ body {
   border: 1px solid rgba(255,255,255,0.7);
   color: var(--text);
   backdrop-filter: blur(8px);
+}
+
+/* ── Clock Widget ── */
+.clock-widget {
+  margin-top: 20px;
+  padding: 16px 24px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.28);
+  border: 1px solid rgba(255,255,255,0.5);
+  backdrop-filter: blur(14px);
+  display: inline-block;
+  min-width: 280px;
+  position: relative;
+  z-index: 1;
+}
+.clock-time {
+  font-size: 38px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #4a6ef7, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 2px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.clock-date {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-soft);
+  margin-bottom: 10px;
+}
+.today-schedule {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  border-top: 1px solid rgba(255,255,255,0.5);
+  padding-top: 10px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.today-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-soft);
+  margin-bottom: 4px;
+}
+.today-mapel-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: rgba(255,255,255,0.35);
+  border-radius: 8px;
+  font-size: 12px;
+}
+.today-mapel-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.today-piket-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+.today-piket-chip {
+  background: rgba(94,142,247,0.15);
+  color: var(--accent1);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.weekend-msg {
+  color: #ec4899;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  padding: 4px 0;
 }
 
 /* ── Nav tabs ── */
@@ -178,6 +290,8 @@ body {
 @media (max-width: 480px) {
   .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .header h1 { font-size: 28px; }
+  .clock-time { font-size: 28px; }
+  .clock-widget { min-width: 220px; }
 }
 
 /* ── Card ── */
@@ -292,6 +406,10 @@ body {
   background: rgba(255,255,255,0.7);
   box-shadow: 0 4px 16px rgba(94,142,247,0.2);
 }
+.hari-btn.today-hari {
+  border-color: #a855f7;
+  color: #a855f7;
+}
 .mapel-list { display: flex; flex-direction: column; gap: 10px; }
 .mapel-item {
   display: flex;
@@ -304,6 +422,10 @@ body {
   transition: all 0.2s;
 }
 .mapel-item:hover { background: rgba(255,255,255,0.5); }
+.mapel-item.now {
+  background: rgba(168,85,247,0.12);
+  border-color: rgba(168,85,247,0.4);
+}
 .mapel-time {
   font-size: 12px;
   font-weight: 800;
@@ -322,6 +444,15 @@ body {
 }
 .mapel-name  { font-weight: 700; font-size: 15px; flex: 1; }
 .mapel-guru  { font-size: 12px; color: var(--text-soft); font-weight: 600; }
+.now-badge {
+  font-size: 10px;
+  font-weight: 800;
+  background: #a855f7;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 100px;
+  letter-spacing: 0.5px;
+}
 
 /* ── Piket ── */
 .piket-day {
@@ -334,6 +465,10 @@ body {
 .piket-day:hover {
   transform: translateY(-4px);
   box-shadow: 0 10px 28px rgba(0,0,0,0.1);
+}
+.piket-day.today-piket {
+  border-color: rgba(168,85,247,0.45);
+  background: rgba(168,85,247,0.07);
 }
 .piket-day-name {
   font-weight: 800;

@@ -14,7 +14,6 @@ const siswaList = [
   "Muhammad Zahran Alfahri",      "Muhammad Zetta Natawijaya",         "Nafisha Aulia Sutendi",
   "Naura Raisya Mumtaaza",   "Nisrina Alyaa Puspitasari",     "Ramzi Aujal Majdi Mustopa",
   "Richi Ramadhani Qodar",     "Sabian Kaleano Alfaithy",
-  /* 4 siswa baru — total 36 */
   "Salsabila Fatin",     "Triana Angga Saputra",      "Triani Pusvitasari Komarudin",
   "Vira Arini Ramadhani"
 ];
@@ -97,7 +96,6 @@ const jadwalPelajaran = {
   ],
 };
 
-/* Piket dibagi merata: 36 siswa → 5 hari (7-7-7-7-8) */
 const piketData = [
   { hari: "Senin",  emoji: "🌅", siswa: ["Fadel","Triana","Ezra","Wildan","Khalisa","Triani","Vira"] },
   { hari: "Selasa", emoji: "🌤️", siswa: ["Zahran","Faisal","Zetta","Faris","Afnia","Nisrina","Nafisha"] },
@@ -107,7 +105,117 @@ const piketData = [
 ];
 
 const hariList = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"];
-let activeHari  = "Senin";
+
+// Map JS getDay() → hari name (0=Sun, 1=Mon, ..., 5=Fri, 6=Sat)
+const hariMap = { 1: "Senin", 2: "Selasa", 3: "Rabu", 4: "Kamis", 5: "Jumat" };
+const hariIdMap = { Senin: 1, Selasa: 2, Rabu: 3, Kamis: 4, Jumat: 5 };
+
+const hariNamaId = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+const bulanId = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+
+let activeHari = "Senin";
+
+/* ============================================================
+   CLOCK & DATE
+   ============================================================ */
+function getTodayHari() {
+  const d = new Date();
+  return hariMap[d.getDay()] || null; // null = weekend
+}
+
+function getTimeMinutes() {
+  const d = new Date();
+  return d.getHours() * 60 + d.getMinutes();
+}
+
+function parseWaktu(waktu) {
+  // "07.40–09.00" → { start: 460, end: 540 }
+  const parts = waktu.split('–');
+  if (parts.length < 2) return null;
+  const toMin = s => {
+    const [h, m] = s.trim().split('.').map(Number);
+    return h * 60 + (m || 0);
+  };
+  return { start: toMin(parts[0]), end: toMin(parts[1]) };
+}
+
+function getCurrentMapelIndex(hari) {
+  if (!hari || !jadwalPelajaran[hari]) return -1;
+  const now = getTimeMinutes();
+  return jadwalPelajaran[hari].findIndex(m => {
+    const t = parseWaktu(m.waktu);
+    return t && now >= t.start && now < t.end;
+  });
+}
+
+function updateClock() {
+  const now   = new Date();
+  const h     = String(now.getHours()).padStart(2, '0');
+  const m     = String(now.getMinutes()).padStart(2, '0');
+  const s     = String(now.getSeconds()).padStart(2, '0');
+  document.getElementById('clock-time').textContent = `${h}:${m}:${s}`;
+
+  const dayName   = hariNamaId[now.getDay()];
+  const tanggal   = now.getDate();
+  const bulan     = bulanId[now.getMonth()];
+  const tahun     = now.getFullYear();
+  document.getElementById('clock-date').textContent = `${dayName}, ${tanggal} ${bulan} ${tahun}`;
+
+  renderTodaySchedule();
+}
+
+function renderTodaySchedule() {
+  const todayHari = getTodayHari();
+  const el = document.getElementById('today-schedule');
+
+  if (!todayHari) {
+    el.innerHTML = `<div class="weekend-msg">🎉 Weekend! Istirahat dulu ya ✨</div>`;
+    return;
+  }
+
+  const nowIdx = getCurrentMapelIndex(todayHari);
+  const mapels = jadwalPelajaran[todayHari];
+  const piket  = piketData.find(p => p.hari === todayHari);
+
+  // Show current lesson OR next lesson
+  let infoHTML = `<div class="today-label">📅 Hari ini: ${todayHari}</div>`;
+
+  if (nowIdx >= 0) {
+    const cur = mapels[nowIdx];
+    infoHTML += `
+      <div class="today-mapel-item">
+        <div class="today-mapel-dot" style="background:${cur.color}"></div>
+        <span><strong>Sekarang:</strong> ${cur.mapel} ${cur.guru !== '—' ? '· ' + cur.guru : ''}</span>
+      </div>`;
+  } else {
+    // Find next lesson
+    const now = getTimeMinutes();
+    const next = mapels.find(m => {
+      const t = parseWaktu(m.waktu);
+      return t && now < t.start;
+    });
+    if (next) {
+      infoHTML += `
+        <div class="today-mapel-item">
+          <div class="today-mapel-dot" style="background:${next.color}"></div>
+          <span><strong>Berikutnya:</strong> ${next.mapel} (${next.waktu})</span>
+        </div>`;
+    } else {
+      infoHTML += `<div class="today-mapel-item">✅ Pelajaran hari ini sudah selesai!</div>`;
+    }
+  }
+
+  // Piket info
+  if (piket) {
+    infoHTML += `
+      <div class="today-label" style="margin-top:8px">🧹 Piket hari ini:</div>
+      <div class="today-piket-row">
+        ${piket.siswa.map(s => `<span class="today-piket-chip">${s}</span>`).join('')}
+      </div>`;
+  }
+
+  el.innerHTML = infoHTML;
+}
 
 /* ============================================================
    RENDER — DAFTAR SISWA
@@ -152,24 +260,31 @@ function renderPengurus() {
    RENDER — JADWAL PELAJARAN
    ============================================================ */
 function renderHariTabs() {
-  const tabs = document.getElementById("hari-tabs");
+  const tabs     = document.getElementById("hari-tabs");
+  const todayHari = getTodayHari();
   tabs.innerHTML = hariList.map(h => `
-    <button class="hari-btn ${h === activeHari ? 'active' : ''}"
-            onclick="switchHari('${h}')">${h}</button>
+    <button class="hari-btn ${h === activeHari ? 'active' : ''} ${h === todayHari ? 'today-hari' : ''}"
+            onclick="switchHari('${h}')">
+      ${h === todayHari ? '📍 ' : ''}${h}
+    </button>
   `).join('');
 }
 
 function renderMapel() {
-  const list   = document.getElementById("mapel-list");
-  const mapels = jadwalPelajaran[activeHari];
-  list.innerHTML = mapels.map(m => `
-    <div class="mapel-item">
+  const list      = document.getElementById("mapel-list");
+  const mapels    = jadwalPelajaran[activeHari];
+  const todayHari = getTodayHari();
+  const nowIdx    = activeHari === todayHari ? getCurrentMapelIndex(activeHari) : -1;
+
+  list.innerHTML = mapels.map((m, i) => `
+    <div class="mapel-item ${i === nowIdx ? 'now' : ''}">
       <div class="mapel-time">${m.waktu}</div>
       <div class="mapel-dot" style="background:${m.color}"></div>
       <div style="flex:1">
         <div class="mapel-name">${m.mapel}</div>
         <div class="mapel-guru">${m.guru !== '—' ? '👨‍🏫 ' + m.guru : m.guru}</div>
       </div>
+      ${i === nowIdx ? '<span class="now-badge">SEKARANG</span>' : ''}
     </div>
   `).join('');
 }
@@ -186,12 +301,14 @@ function switchHari(hari) {
 const piketTools = ['🧹','🪣','🗑️','🧽','🚿','🪴','✨','🌊'];
 
 function renderPiket() {
-  const grid = document.getElementById("piket-grid");
+  const grid      = document.getElementById("piket-grid");
+  const todayHari = getTodayHari();
   grid.innerHTML = piketData.map(p => `
-    <div class="piket-day">
+    <div class="piket-day ${p.hari === todayHari ? 'today-piket' : ''}">
       <div class="piket-day-name">
         <span style="font-size:20px">${p.emoji}</span>
         ${p.hari}
+        ${p.hari === todayHari ? '<span style="font-size:11px;background:#a855f720;color:#a855f7;padding:2px 8px;border-radius:100px;font-weight:800">Hari ini</span>' : ''}
         <span style="font-size:12px;font-weight:600;color:rgba(26,26,46,0.5);margin-left:auto">
           ${p.siswa.length} orang
         </span>
@@ -237,7 +354,6 @@ function createSparkles() {
   }
 }
 
-/* Sparkle acak saat klik mana saja (15% chance) */
 document.addEventListener('click', (e) => {
   if (Math.random() >= 0.15) return;
   const sp = document.createElement('div');
@@ -253,8 +369,23 @@ document.addEventListener('click', (e) => {
 /* ============================================================
    INIT
    ============================================================ */
+
+// Set active hari to today (if weekday), else default Senin
+const todayHariInit = getTodayHari();
+if (todayHariInit) activeHari = todayHariInit;
+
 renderSiswa();
 renderPengurus();
 renderHariTabs();
 renderMapel();
 renderPiket();
+
+// Start clock
+updateClock();
+setInterval(updateClock, 1000);
+
+// Re-render mapel every minute (to update "SEKARANG" badge)
+setInterval(() => {
+  renderMapel();
+  renderPiket();
+}, 60000);
